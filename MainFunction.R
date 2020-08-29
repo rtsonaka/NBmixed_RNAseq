@@ -1,15 +1,5 @@
-if(FALSE){
-formula.nbmixed <- "time. + group + time.:group" 
-formula.nbmixed.0 <- "time." 
-data <- data.
-nboots <- 5
-n.genes <- 10
-gene.nams <- as.character(1:10)
-nAGQ <- nAGQ. <- 21
-test.coefs <- c("group", "time.:group")
-}
-
 longRNAseq <- function(formula.nbmixed, formula.nbmixed.0, 
+                       formula.random,
                        data, nboots, test.coefs,
                        n.genes, gene.nams, nAGQ){
   
@@ -30,7 +20,7 @@ longRNAseq <- function(formula.nbmixed, formula.nbmixed.0,
                              formula.nbmixed.0, sep = "+"))
     
     model.1 <- try(mixed_model(form, 
-                                  data, random = ~ 1 | ID, 
+                                  data, random = as.formula(formula.random), 
                                   family = GLMMadaptive::negative.binomial(), 
                                   nAGQ = nAGQ))
     distr.genes[k] <- "NB"
@@ -41,17 +31,17 @@ longRNAseq <- function(formula.nbmixed, formula.nbmixed.0,
          exp(model.1$phis) > 1000
          }){
       model.1 <- try(mixed_model(fixed = form, 
-                                 random = ~ 1 | ID, data = data, 
+                                 random = as.formula(formula.random), data = data, 
                                  family = poisson(), nAGQ = nAGQ))
       model.0 <- try(mixed_model(fixed = form.0, 
-                                 random = ~ 1 | ID, data = data, 
+                                 random = as.formula(formula.random), data = data, 
                                  family = poisson(), nAGQ = nAGQ))
       distr.genes[k] <- "P"
       disp.genes[k] <- NA
     }else{
       
       model.0 <- try(mixed_model(fixed = form.0, 
-                                 random = ~ 1 | ID, data = data, 
+                                 random = as.formula(formula.random), data = data, 
                                  family = GLMMadaptive::negative.binomial(), 
                                  nAGQ = nAGQ))
       disp.genes[k] <- exp(model.1$phis)
@@ -75,7 +65,7 @@ longRNAseq <- function(formula.nbmixed, formula.nbmixed.0,
         }
         #bootstrap
         model.1.boot <- model.1
-        model.1.boot$coefficients[test.coefs] <- c(0,0)#change!
+        model.1.boot$coefficients[test.coefs] <- c(0,0)
         
         form.boot <- as.formula(paste("Resp ~ offset(ln.lib.size)", 
                                  formula.nbmixed, sep = "+"))
@@ -88,18 +78,18 @@ longRNAseq <- function(formula.nbmixed, formula.nbmixed.0,
                                 new_RE = TRUE)
           if(distr.genes[k] == "P"){
             model.1boot <- try(mixed_model(fixed = form.boot, 
-                                           random = ~ 1 | ID, data = data, 
+                                           random = as.formula(formula.random), data = data, 
                                            family = poisson(), nAGQ = nAGQ))
             model.0boot <- try(mixed_model(fixed = form.boot.0, 
-                                           random = ~ 1 | ID, data = data, 
+                                           random = as.formula(formula.random), data = data, 
                                            family = poisson(), nAGQ = nAGQ))
           }else{
             model.1boot <- try(mixed_model(fixed = form.boot, 
-                                           random = ~ 1 | ID, data = data, 
+                                           random = as.formula(formula.random), data = data, 
                                            family = GLMMadaptive::negative.binomial(), 
                                            nAGQ = nAGQ))
             model.0boot <- try(mixed_model(fixed = form.boot.0, 
-                                           random = ~ 1 | ID, data = data, 
+                                           random = as.formula(formula.random), data = data, 
                                            family = GLMMadaptive::negative.binomial(), 
                                            nAGQ = nAGQ))
           }

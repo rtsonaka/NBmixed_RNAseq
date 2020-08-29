@@ -60,7 +60,4 @@ data. <- simulate_data(n = 10, n.i = 5, ngenes = ngenes,
                        seed. = 1234)
 
 
-file. <- "C:/RoulaTsonaka/Supervisions/MirkoSignorelli/Manuscripts/Paper2/BRIBIO_LaTex_Template-Jan2020/Revision1_August2020/github/"
-write.table(data., paste(file., "Dataset.txt"))
-
 

@@ -10,16 +10,22 @@
 #      via the GLMMadaptive R package and the boostrap method to 
 #      empirically derive the p-values per gene.
 #      The main function is longRNAseq(.) with arguments:
-#       - formula.lmer = a two-sided linear formula object to be used in lmer(.) describing both the 
-#                        fixed-effects and random-effects part of the model, 
-#                        with the response on the left of a ~ operator and the terms, 
+#       - formula.nbmixed = a two-sided linear formula object to be used in mixed_models(.) 
+#                        describing the fixed-effects part of the model under the alternative 
+#                        hypothesis, with the response on the left of a ~ operator and the terms, 
 #                        separated by + operators, on the right. 
 #                        Regarding the random-effects terms only random-intercepts are used at the moment.
+#       - formula.nbmixed.0 = a two-sided linear formula object to be used in mixed_models(.) 
+#                        describing the fixed-effects part of the model under the null 
+#                        hypothesis.
+#       - formula.random = a two-sided linear formula object to be used in mixed_models(.) 
+#                        describing the random-effects part of the model.
 #       - data = dataframe containing the variables named in formula and the RNAseq data in each column per genomic feature.
-#       - Time = a character string with the variable name in data for the followup time.
-#       - ID = a character string with the variable name in data for the subject indicator.
+#       - nboots = numeric scalar denoting the number of bootstrap samples.
+#       - test.coefs = a character string with the the names of the fixed-effects parameters to be tested.
+#       - n.genes = numeric scalar denoting the number of genes.
 #       - gene.nams = a character string with the gene names in data.
-#       - dmat.voom = design matrix to be used in limma.
+#       - nAGQ = numeric scalar denoting the number of quadrature points.
 #
 # Date: 27AUGUST2020
 ###########################################################################################################
@@ -37,10 +43,11 @@ data. <- read.table("./Dataset.txt")
 # Differential expression testing
 diff.expr <- longRNAseq(formula.nbmixed = "time. + group + time.:group",
                         formula.nbmixed.0 = "time.",
+                        formula.random = "~1|ID", 
                         data = data.,
                         nboots = 2,
                         n.genes = 5,
-                        gene.nams = as.character(1:5),
+                        gene.nams = paste("X", 1:5, sep = ""),
                         test.coefs = c("group", "time.:group"),
                         nAGQ = 11)
 
